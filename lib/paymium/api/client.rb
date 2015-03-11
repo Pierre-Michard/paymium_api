@@ -1,11 +1,9 @@
-require "active_support/hash_with_indifferent_access"
-require "active_support/core_ext/object/blank"
-require "net/http"
-require 'json'
+require 'active_support/hash_with_indifferent_access'
+require 'active_support/core_ext/object/blank'
+require 'net/http'
 
 require 'openssl'
 require 'base64'
-
 
 module Paymium
   module Api
@@ -24,7 +22,7 @@ module Paymium
 
       def post path, params = {}, &block
         req = Net::HTTP::Post.new(uri_from_path(path))
-        req.body = params.to_json
+        req.body = Oj.dump(params)
         request req, &block
       end
 
@@ -60,7 +58,7 @@ module Paymium
       #todo use Oj to parse response to handle big decimal
       def handle_response resp, &block
         if resp.class < Net::HTTPSuccess
-          resp = JSON.parse(resp.body)
+          resp = Oj.load(resp.body)
           block.nil? ? resp : block.call(resp)
         else
           raise Error, resp.message
