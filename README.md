@@ -33,7 +33,7 @@ Or install it yourself as:
 ## TODO
 - test merchants API
 - Dev oAuth api points
-- add delete method for orders's cancelations
+- Better error management
 
 ## Contributing
 
