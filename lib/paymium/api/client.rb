@@ -26,6 +26,11 @@ module Paymium
         request req, &block
       end
 
+      def delete path, params = {}, &block
+        uri       = uri_from_path(path)
+        uri.query = URI.encode_www_form params unless params.empty?
+        request Net::HTTP::Delete.new(uri), &block
+      end
 
       private
 
@@ -61,7 +66,11 @@ module Paymium
           resp = Oj.load(resp.body)
           block.nil? ? resp : block.call(resp)
         else
-          raise Error, resp.message
+          if resp.content_type == 'application/json'
+            raise Error, [resp.message, Oj.load(resp.body)['errors']]
+          else
+            raise Error, resp.message
+          end
         end
       end
 
@@ -70,4 +79,3 @@ module Paymium
     end
   end
 end
-
