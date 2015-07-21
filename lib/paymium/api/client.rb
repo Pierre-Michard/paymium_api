@@ -4,7 +4,6 @@ require 'net/http'
 
 require 'openssl'
 require 'base64'
-require 'pry'
 
 module Paymium
   module Api
