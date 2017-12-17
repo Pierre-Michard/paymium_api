@@ -63,7 +63,7 @@ module Paymium
       #todo use Oj to parse response to handle big decimal
       def handle_response resp, &block
         if resp.class < Net::HTTPSuccess
-          resp = Oj.load(resp.body)
+          resp = resp.body.empty? ? nil : Oj.load(resp.body)
           block.nil? ? resp : block.call(resp)
         else
           if resp.content_type == 'application/json'
