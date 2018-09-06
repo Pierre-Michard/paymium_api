@@ -8,10 +8,12 @@ require 'base64'
 module Paymium
   module Api
     class Client
+      attr_accessor :remaining_limit
 
       def initialize config = {}
         @config = HashWithIndifferentAccess.new config
         @host = URI.parse @config.delete(:host)
+        @remaining_limit = 5000
       end
 
       def get path, params = {}, &block
@@ -63,9 +65,9 @@ module Paymium
       #todo use Oj to parse response to handle big decimal
       def handle_response resp, &block
         if resp.class < Net::HTTPSuccess
-          remaining_limit = resp['X-Ratelimit-Remaining']
+          @remaining_limit = resp['X-Ratelimit-Remaining']
           resp = resp.body.empty? ? nil : Oj.load(resp.body)
-          block.nil? ? resp : block.call(resp, remaining_limit)
+          block.nil? ? resp : block.call(resp)
         else
           if resp.content_type == 'application/json'
             raise Error, [resp.message, Oj.load(resp.body)['errors']]
