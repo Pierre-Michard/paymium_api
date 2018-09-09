@@ -24,6 +24,13 @@ describe Paymium::Api::Client do
     expect(user).to have_key 'name'
   end
 
+  describe '#remaining_limit' do
+    before { client.get('/user') }
+    it 'is updated after get request' do
+      expect { client.get('/user') }.to change { client.remaining_limit }.by(-1)
+    end
+  end
+
   it 'get websocket info' do
     thr = Thread.new { system( "node ws.js" )}
     conn = Bunny.new

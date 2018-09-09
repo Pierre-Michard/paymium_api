@@ -13,7 +13,7 @@ module Paymium
       def initialize config = {}
         @config = HashWithIndifferentAccess.new config
         @host = URI.parse @config.delete(:host)
-        @remaining_limit = 5000
+        @remaining_limit = 100_000
       end
 
       def get path, params = {}, &block
@@ -65,7 +65,9 @@ module Paymium
       #todo use Oj to parse response to handle big decimal
       def handle_response resp, &block
         if resp.class < Net::HTTPSuccess
-          @remaining_limit = resp['X-Ratelimit-Remaining']
+          if resp.key? 'X-Ratelimit-Remaining'
+            @remaining_limit = resp['X-Ratelimit-Remaining'].to_i
+          end
           resp = resp.body.empty? ? nil : Oj.load(resp.body)
           block.nil? ? resp : block.call(resp)
         else
