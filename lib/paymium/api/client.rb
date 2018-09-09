@@ -13,7 +13,7 @@ module Paymium
       def initialize config = {}
         @config = HashWithIndifferentAccess.new config
         @host = URI.parse @config.delete(:host)
-        @remaining_limit = 100_000
+        @remaining_limit = nil
       end
 
       def get path, params = {}, &block
